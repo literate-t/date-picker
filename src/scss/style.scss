@@ -119,18 +119,18 @@
         &.selected {
           background-color: #00ca85;
         }
-        // 일요일 계산
-        &:nth-child(7n + 2) {
-          color: red;
-        }
-        // 토요일 계산
-        &:nth-child(7n + 1) {
-          color: blue;
-        }
-        // 시작 날짜 계산
-        &:first-child {
-          grid-column-start: 7;
-        }
+        // // 일요일 계산
+        // &:nth-child(7n + 2) {
+        //   color: red;
+        // }
+        // // 토요일 계산
+        // &:nth-child(7n + 1) {
+        //   color: blue;
+        // }
+        // // 시작 날짜 계산
+        // &:first-child {
+        //   grid-column-start: 7;
+        // }
       }
     }
   }
