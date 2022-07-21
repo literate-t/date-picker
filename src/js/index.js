@@ -30,7 +30,18 @@ class DatePicker {
   constructor() {
     this.#initCalendarDate();
     this.#initElement();
+    this.#initSelectedDate();
+    this.#setDateInput();
     this.#addEvent();
+  }
+
+  #initSelectedDate() {
+    this.#selectedDate = { ...this.#calendarDate };
+  }
+
+  #setDateInput() {
+    this.#dateInput.textContent = this.#decorateDate(this.#selectedDate.data);
+    this.#dateInput.dataset.value = this.#selectedDate.data;
   }
 
   #initCalendarDate() {
@@ -53,6 +64,7 @@ class DatePicker {
   #prevButton;
   #nextButton;
   #dates;
+  #selectedDate;
 
   #initElement() {
     this.#datePicker = document.getElementById('date-picker');
@@ -75,6 +87,42 @@ class DatePicker {
       'click',
       this.#moveToPrevMonth.bind(this)
     );
+    this.#dates.addEventListener('click', this.#onSelectDate.bind(this));
+  }
+
+  #onSelectDate(event) {
+    const { target } = event;
+    if (target.dataset.date) {
+      this.#dates.querySelector('.selected')?.classList.remove('selected');
+      //target.classList.add('selected');
+      this.#selectedDate = {
+        data: new Date(
+          this.#calendarDate.year,
+          this.#calendarDate.month,
+          target.dataset.date
+        ),
+        year: this.#calendarDate.year,
+        month: this.#calendarDate.month,
+        date: target.dataset.date,
+      };
+      this.#setDateInput();
+      this.#calendar.classList.remove('active');
+    }
+  }
+
+  #decorateDate(data) {
+    let date = data.getDate();
+    let month = data.getMonth() + 1;
+    const year = data.getFullYear();
+    if (date < 10) {
+      date = `0${date}`;
+    }
+
+    if (month < 10) {
+      month = `0${month}`;
+    }
+
+    return `${year}/${month}/${date}`;
   }
 
   #moveToNextMonth() {
@@ -96,6 +144,9 @@ class DatePicker {
   }
 
   #toggleCalendar() {
+    if (this.#calendar.classList.contains('active')) {
+      this.#calendarDate = { ...this.#selectedDate };
+    }
     this.#calendar.classList.toggle('active');
     this.#updateMonthDate();
   }
@@ -137,6 +188,18 @@ class DatePicker {
     this.#colorSaturday();
     this.#colorSunday();
     this.#markToday();
+    this.#markSelectedDate();
+  }
+
+  #markSelectedDate() {
+    if (
+      this.#selectedDate.year === this.#calendarDate.year &&
+      this.#selectedDate.month === this.#calendarDate.month
+    ) {
+      this.#dates
+        .querySelector(`[data-date='${this.#selectedDate.date}']`)
+        .classList.add('selected');
+    }
   }
 
   #markToday() {
