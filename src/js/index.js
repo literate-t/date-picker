@@ -67,10 +67,40 @@ class DatePicker {
 
   #addEvent() {
     this.#dateInput.addEventListener('click', this.#toggleCalendar.bind(this));
+    this.#nextButton.addEventListener(
+      'click',
+      this.#moveToNextMonth.bind(this)
+    );
+    this.#prevButton.addEventListener(
+      'click',
+      this.#moveToPrevMonth.bind(this)
+    );
   }
 
-  #toggleCalendar(event) {
+  #moveToNextMonth() {
+    this.#calendarDate.month += 1;
+    if (this.#calendarDate.month > 11) {
+      this.#calendarDate.year += 1;
+      this.#calendarDate.month = 0;
+    }
+    this.#updateMonthDate();
+  }
+
+  #moveToPrevMonth() {
+    this.#calendarDate.month -= 1;
+    if (this.#calendarDate.month < 0) {
+      this.#calendarDate.year -= 1;
+      this.#calendarDate.month = 11;
+    }
+    this.#updateMonthDate();
+  }
+
+  #toggleCalendar() {
     this.#calendar.classList.toggle('active');
+    this.#updateMonthDate();
+  }
+
+  #updateMonthDate() {
     this.#updateMonth();
     this.#updateDates();
   }
@@ -104,6 +134,54 @@ class DatePicker {
       new Date(this.#calendarDate.year, this.#calendarDate.month).getDay() + 1;
     docFrag.firstChild.style.gridColumnStart = startDay;
     this.#dates.append(docFrag);
+    this.#colorSaturday();
+    this.#colorSunday();
+    this.#markToday();
+  }
+
+  #markToday() {
+    const current = new Date();
+    const thisYear = current.getFullYear();
+    const thisMonth = current.getMonth();
+    const today = current.getDate();
+
+    if (
+      thisYear === this.#calendarDate.year &&
+      thisMonth === this.#calendarDate.month
+    ) {
+      this.#dates
+        .querySelector(`[data-date='${today}']`)
+        .classList.add('today');
+    }
+  }
+
+  #colorSaturday() {
+    const satudays = this.#dates.querySelectorAll(
+      `.date:nth-child(7n+${
+        7 - new Date(this.#calendarDate.year, this.#calendarDate.month).getDay()
+      })`
+    );
+
+    for (let i = 0; i < satudays.length; ++i) {
+      satudays[i].style.color = 'blue';
+    }
+  }
+
+  #colorSunday() {
+    const sundays = this.#dates.querySelectorAll(
+      `.date:nth-child(7n + ${
+        (8 -
+          new Date(
+            this.#calendarDate.year,
+            this.#calendarDate.month
+          ).getDay()) %
+        7
+      })`
+    );
+
+    for (let i = 0; i < sundays.length; ++i) {
+      sundays[i].style.color = 'red';
+    }
   }
 }
 
